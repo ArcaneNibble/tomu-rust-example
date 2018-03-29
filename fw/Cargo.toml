@@ -3,7 +3,7 @@ authors = ["Robert Ou <rqou@berkeley.edu"]
 categories = ["embedded", "no-std"]
 description = "Tomu.im Rust demo"
 keywords = ["arm", "cortex-m"]
-license = "BSD"
+license = "0BSD"
 name = "tomu-rust-example"
 version = "0.0.1"
 
