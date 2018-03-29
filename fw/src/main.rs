@@ -28,14 +28,15 @@ app! {
 
     resources: {
         static GPIO: efm32hg309::GPIO;
+        static SYST: cortex_m::peripheral::SYST;
     },
 
     idle: {
-        resources: [GPIO],
+        resources: [GPIO, SYST],
     },
 }
 
-fn init(p: init::Peripherals) -> init::LateResources {
+fn init(mut p: init::Peripherals) -> init::LateResources {
     // Initialize the allocator
     let start = unsafe { &mut _sheap as *mut u32 as usize };
     let end = unsafe { &mut _eheap as *mut u32 as usize };
@@ -55,17 +56,30 @@ fn init(p: init::Peripherals) -> init::LateResources {
     p.device.GPIO.pa_doutclr.write(|w| unsafe {w.bits(0b00000001) });
     p.device.GPIO.pb_doutclr.write(|w| unsafe {w.bits(0b10000000) });
 
+    p.core.SYST.set_reload(14_000_000 - 1);
+    p.core.SYST.clear_current();
+    p.core.SYST.set_clock_source(cortex_m::peripheral::syst::SystClkSource::Core);
+    p.core.SYST.enable_counter();
+
     init::LateResources {
         GPIO: p.device.GPIO,
+        SYST: p.core.SYST,
     }
 }
 
 fn idle(_t: &mut Threshold, r: idle::Resources) -> ! {
+    let mut state = false;
     loop {
-        r.GPIO.pa_doutset.write(|w| unsafe {w.bits(0b00000001) });
-        r.GPIO.pb_doutset.write(|w| unsafe {w.bits(0b10000000) });
+        while !r.SYST.has_wrapped() {}
 
-        r.GPIO.pa_doutclr.write(|w| unsafe {w.bits(0b00000001) });
-        r.GPIO.pb_doutclr.write(|w| unsafe {w.bits(0b10000000) });
+        state = !state;
+
+        if state {
+            r.GPIO.pa_doutset.write(|w| unsafe {w.bits(0b00000001) });
+            r.GPIO.pb_doutset.write(|w| unsafe {w.bits(0b10000000) });
+        } else {
+            r.GPIO.pa_doutclr.write(|w| unsafe {w.bits(0b00000001) });
+            r.GPIO.pb_doutclr.write(|w| unsafe {w.bits(0b10000000) });
+        }
     }
 }
