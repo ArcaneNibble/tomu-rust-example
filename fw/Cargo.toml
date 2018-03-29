@@ -1,0 +1,35 @@
+[package]
+authors = ["Robert Ou <rqou@berkeley.edu"]
+categories = ["embedded", "no-std"]
+description = "Tomu.im Rust demo"
+keywords = ["arm", "cortex-m"]
+license = "BSD"
+name = "tomu-rust-example"
+version = "0.0.1"
+
+[dependencies]
+cortex-m = "0.4.3"
+# cortex-m-rtfm = "0.3.1"
+# alloc-cortex-m = "0.3.2"
+
+[dependencies.cast]
+version = "0.2.2"
+default-features = false
+
+[dependencies.cortex-m-rt]
+version = "0.3.13"
+features = ["abort-on-panic"]
+
+[dependencies.efm32hg309]
+features = ["rt"]
+path = "../efm32hg309"
+
+# disable both incremental compilation and parallel codegen to reduce the chances of running into
+# rust-lang/rust#47074
+[profile.dev]
+codegen-units = 1
+incremental = false
+
+[profile.release]
+debug = true
+lto = true
