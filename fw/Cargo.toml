@@ -9,7 +9,7 @@ version = "0.0.1"
 
 [dependencies]
 cortex-m = "0.4.3"
-# cortex-m-rtfm = "0.3.1"
+cortex-m-rtfm = "0.3.1"
 # alloc-cortex-m = "0.3.2"
 
 [dependencies.cast]
@@ -23,6 +23,9 @@ features = ["abort-on-panic"]
 [dependencies.efm32hg309]
 features = ["rt"]
 path = "../efm32hg309"
+
+[dependencies.alloc-cortex-m]
+path = "../alloc-cortex-m"
 
 # disable both incremental compilation and parallel codegen to reduce the chances of running into
 # rust-lang/rust#47074
